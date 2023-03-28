@@ -41,6 +41,9 @@ def read_climate_data(filename, metadata):
     # transpose the data to have countries as columns
     df_countries = df_countries.transpose()
 
+    # clean the transposed dataframe
+    df_countries = df_countries.dropna()
+
     # return both the original and transposed dataframes
     return df_year, df_countries
 
