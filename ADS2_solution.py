@@ -9,42 +9,55 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-def read_climate_data(filename, metadata):
+def read_climate_data(filename):
+    """
+    This function reads indicator specific csv file and metadata file in World
+    Bank climate data and returns two dataframes:
+    one with years as columns and one with countries as columns.
+    """
 
-    # read each indicator data from csv
-    df_data = pd.read_csv(filename, header = 2)
+    # read data from csv
+    df_data = pd.read_csv(filename, skiprows = 4)
 
-    # read metadata sv file
-    df_meta = pd.read_csv(metadata)
+    # create a new dataframe to filter five usefull indicators
+    df_climate_change = df_data[
+        (df_data["Indicator Name"] == "Population growth (annual %)") |
+        (df_data["Indicator Name"] == "Forest area (sq. km)") |
+        (df_data["Indicator Name"] == "CO2 emissions (kt)") |
+        (df_data["Indicator Name"] == "Agricultural land (% of land area)") |
+        (df_data["Indicator Name"] == "Access to electricity (% of population)")
+        ].reset_index(drop = True)
 
-    # clean the df_data columns with all NaNs
-    df_data = df_data.dropna(axis=1, how='all')
+    # drop all unnecessary columns
+    df_climate_change = df_climate_change.drop(['Indicator Code',
+                                                'Unnamed: 66',
+                                                '2020',
+                                                '2021'], axis = 1)
 
-    # drop unnecessary columns in df_data
-    df_data = df_data.drop(['Indicator Code'], axis=1)
+    # drop the years between 1960 to 1990
+    df_climate_change = df_climate_change.drop(df_climate_change.iloc[:, 3:33],
+                                               axis = 1)
 
-    # clean the rows with NaNs in df_data
-    df_data = df_data.dropna()
+    # create a dataframe to get years as columns
+    df_year = df_climate_change.copy()
 
-    # filter the required columns
-    df_meta = df_meta[['Country Code', 'Region', 'IncomeGroup']]
-
-    # clean the df_meta data frame
-    df_meta = df_meta.dropna()
-
-    # merge the dataframes based on the country code
-    df_year = pd.merge(df_data, df_meta, on='Country Code', how='inner')
+    # remove all NaNs to clean the dataframe
+    df_year = df_climate_change.dropna(axis = 0)
 
     # set the country name as index
-    df_countries = df_year.set_index('Country Name')
+    df_climate_change = df_climate_change.set_index('Country Name')
 
-    # transpose the data to have countries as columns
-    df_countries = df_countries.transpose()
+    # transpose the dataframe to get countries as columns
+    df_country = df_climate_change.transpose()
 
     # clean the transposed dataframe
-    df_countries = df_countries.dropna()
+    df_country = df_country.dropna(axis = 1)
 
-    # return both the original and transposed dataframes
-    return df_year, df_countries
+    # return both year and country dataframes
+    return df_year, df_country
 
-df_year, df_countries = read_climate_data("Access to electricity.csv", "metadata.csv")
+df_year, df_country = read_climate_data("Climate.csv")
+
+print(df_year)
+# extract 5 countries for statistical analysis
+#df_countries = df_country[["Brazil","United States"]]
