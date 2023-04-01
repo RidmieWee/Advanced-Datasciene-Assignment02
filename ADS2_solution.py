@@ -27,7 +27,7 @@ def read_climate_data(filename):
         (df_data["Indicator Name"] == "Population growth (annual %)") |
         (df_data["Indicator Name"] == "Forest area (sq. km)") |
         (df_data["Indicator Name"] == "CO2 emissions (kt)") |
-        (df_data["Indicator Name"] == "Agricultural land (% of land area)") |
+        (df_data["Indicator Name"] == "Agricultural land (sq. km)") |
         (df_data["Indicator Name"] == "Access to electricity (% of population)")
         ].reset_index(drop=True)
 
@@ -82,7 +82,7 @@ def individual_country_statisctic(country_name):
     # convert data types to numeric
     df_state = df_state.apply(pd.to_numeric, errors='coerce')
 
-    # extrct statistical properties
+    # extract statistical properties
     df_describe = df_state.describe().round(2)
 
     # extract column headers
@@ -109,17 +109,59 @@ def individual_country_statisctic(country_name):
     return
 
 
+def individual_indicator_statistics(indicator_name):
+    """
+    This function get the indicator name as an argument and produce the
+    comparison of the statistical properties of countries for given indicator
+    """
+
+    # extract given indicatordata
+    df_indicator = df_year[df_year['Indicator Name'] == indicator_name]
+
+    # drop unneccesary columns
+    df_indicator = df_indicator.drop(["Country Code", "Indicator Name"],
+                                     axis=1)
+
+    # extract the useful countries for further analysis
+    df_indicator = df_indicator[
+        (df_indicator["Country Name"] == "Brazil") |
+        (df_indicator["Country Name"] == "China") |
+        (df_indicator["Country Name"] == "Germany") |
+        (df_indicator["Country Name"] == "India") |
+        (df_indicator["Country Name"] == "United States")
+        ].reset_index(drop=True)
+
+    # set the country name as index
+    df_indicator = df_indicator.set_index("Country Name")
+
+    # transpose the df
+    df_indicator = df_indicator.T
+
+    # extract statistical properties
+    df_describe = df_indicator.describe().round(2)
+
+    # print the statistics
+    print('========= The summary statistics for', indicator_name, '==========')
+    print('\n')
+    print(df_describe)
+    print('==================================================================')
+    print('\n')
+
+    # return the statistics for each country
+    return
+
+
 # call the function for read file and generate 2 dataframes
 df_year, df_country = read_climate_data("Climate.csv")
-
-# extract required countries for analysis from df_country
-df_brazil = df_country['Brazil']
-df_china = df_country['China']
-df_india = df_country['India']
-df_germany = df_country['Germany']
-df_USA = df_country['United States']
 
 # call the function to extract stat properties of each indicator per state
 individual_country_statisctic('Brazil')
 individual_country_statisctic('Germany')
 individual_country_statisctic('United States')
+
+# call the function to extract stat properties of each country per indicator
+individual_indicator_statistics("Population growth (annual %)")
+individual_indicator_statistics("Forest area (sq. km)")
+individual_indicator_statistics("CO2 emissions (kt)")
+individual_indicator_statistics("Agricultural land (sq. km)")
+individual_indicator_statistics("Access to electricity (% of population)")
