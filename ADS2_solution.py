@@ -64,7 +64,7 @@ def read_climate_data(filename):
 def individual_country_statisctic(country_name):
     """
     This function get the country name as an argument and produce the
-    comparison of the statistical properties of ech indicators per country
+    comparison of the statistical properties of indicators for given country
     """
 
     # extract the given country data
@@ -82,16 +82,27 @@ def individual_country_statisctic(country_name):
     # convert data types to numeric
     df_state = df_state.apply(pd.to_numeric, errors='coerce')
 
-    # set option to wrap long column names and adjust max column width
-    pd.set_option('display.max_colwidth', None)
-    pd.set_option('display.expand_frame_repr', False)
+    # extrct statistical properties
+    df_describe = df_state.describe().round(2)
+
+    # extract column headers
+    cols = df_describe.columns
+
+    # get the half of length of ech column
+    lencols = [int(len(c)/2) for c in cols]
+
+    # get column names into 2 lines based on the length of each column
+    df_describe.columns = pd.MultiIndex.from_tuples(tuple((c[:ln], c[ln:])
+                                                          for c, ln in zip(
+                                                                  cols,
+                                                                  lencols)
+                                                          ))
 
     # print the statistics
-    print('========== The summary statistics for', country_name, '==========')
+    print('========== The summary statistics for', country_name, '===========')
     print('\n')
-    print(df_state.describe().round(2))
+    print(df_describe)
     print('==================================================================')
-    print('\n')
     print('\n')
 
     # return the statistics for each country
