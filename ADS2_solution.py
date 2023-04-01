@@ -9,6 +9,9 @@ Created on Sat Mar 25 17:33:38 2023
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import warnings
+
+from scipy.stats import skew, kurtosis
 
 
 # create function for read file
@@ -60,11 +63,11 @@ def read_climate_data(filename):
     return df_year, df_country
 
 
-# function to compare statistical properties of each indicators per state
-def individual_country_statisctic(country_name):
+# function to extract data for specific countries
+def extract_country_data(country_name):
     """
-    This function get the country name as an argument and produce the
-    comparison of the statistical properties of indicators for given country
+    This function get the country name as an argument and create a new
+    dataframe with data of given country
     """
 
     # extract the given country data
@@ -81,6 +84,20 @@ def individual_country_statisctic(country_name):
 
     # convert data types to numeric
     df_state = df_state.apply(pd.to_numeric, errors='coerce')
+
+    # return the dataframe
+    return df_state
+
+
+# function to compare statistical properties of each indicators per state
+def individual_country_statisctic(country_name):
+    """
+    This function get the country name as an argument and produce the
+    comparison of the statistical properties of indicators for given country
+    """
+
+    # call thefunction to create country dataframe
+    df_state = extract_country_data(country_name)
 
     # extract statistical properties
     df_describe = df_state.describe().round(2)
@@ -165,3 +182,52 @@ individual_indicator_statistics("Forest area (sq. km)")
 individual_indicator_statistics("CO2 emissions (kt)")
 individual_indicator_statistics("Agricultural land (sq. km)")
 individual_indicator_statistics("Access to electricity (% of population)")
+
+# extrcact useful countries
+df_Brazil = extract_country_data('Brazil')
+df_Germany = extract_country_data('Germany')
+df_USA = extract_country_data('United States')
+
+# assign the columns into new dataframe
+df_bcols = df_Brazil.columns
+df_gcols = df_Germany.columns
+df_ucols = df_USA.columns
+
+# find the skewness, round it to 2 decimals and put it into dictionary
+brazil_skew = df_Brazil.apply(skew).round(2).to_dict()
+Germany_skew = df_Germany.apply(skew).round(2).to_dict()
+USA_skew = df_USA.apply(skew).round(2).to_dict()
+
+# find the kutosis, round it to 2 decimals and put it into dictionary
+brazil_kurtosis = df_Brazil.apply(kurtosis).round(2).to_dict()
+Germany_kurtosis = df_Germany.apply(kurtosis).round(2).to_dict()
+USA_kurtosis = df_USA.apply(kurtosis).round(2).to_dict()
+
+# ignore warning
+warnings.filterwarnings("ignore", message="Precision loss occurred in moment\
+                        calculation due to catastrophic cancellation")
+
+# create dictionary to store summary statistics
+stats = {
+    ("Variance", "Brazil"): {
+        c: round(np.var(df_Brazil[c]), 2) for c in df_bcols
+    },
+    ("Variance", "Germany"): {
+        c: round(np.var(df_Germany[c]), 2) for c in df_gcols
+    },
+    ("Variance", "USA"): {
+        c: round(np.var(df_USA[c]), 2) for c in df_ucols
+    },
+    ("Skewness", "Brazil"): brazil_skew,
+    ("Skewness", "Germany"): Germany_skew,
+    ("Skewness", "USA"): USA_skew,
+    ("Kutosis", "Brazil"): brazil_kurtosis,
+    ("Kutosis", "Germany"): Germany_kurtosis,
+    ("Kutosis", "USA"): USA_kurtosis
+}
+
+# assign statistics into a dataframe
+df_statistics = pd.DataFrame(stats)
+
+# print the summary statistics
+print(df_statistics)
