@@ -31,8 +31,21 @@ def read_climate_data(filename):
         (df_data["Indicator Name"] == "Forest area (sq. km)") |
         (df_data["Indicator Name"] == "CO2 emissions (kt)") |
         (df_data["Indicator Name"] == "Agricultural land (sq. km)") |
-        (df_data["Indicator Name"] == "Access to electricity (% of population)")
-        ].reset_index(drop=True)
+        (df_data["Indicator Name"] ==
+         "Renewable energy consumption (% of total final energy consumption)")
+    ].reset_index(drop=True)
+
+    df_climate_change["Indicator Name"] = df_climate_change["Indicator Name"].replace(
+        ["Population growth (annual %)",
+         "Forest area (sq. km)",
+         "CO2 emissions (kt)",
+         "Agricultural land (sq. km)",
+         "Renewable energy consumption (% of total final energy consumption)"],
+        ["Population growth(%)",
+         "Forest area(km^2)",
+         "CO2 emissions(kt)",
+         "Agricultural land(km^2)",
+         "Renew. energy consump(%)"])
 
     # drop all unnecessary columns
     df_climate_change = df_climate_change.drop(['Indicator Code',
@@ -111,9 +124,9 @@ def individual_country_statisctic(country_name):
     # get column names into 2 lines based on the length of each column
     df_describe.columns = pd.MultiIndex.from_tuples(tuple((c[:ln], c[ln:])
                                                           for c, ln in zip(
-                                                                  cols,
-                                                                  lencols)
-                                                          ))
+        cols,
+        lencols)
+    ))
 
     # print the statistics
     print('========== The summary statistics for', country_name, '===========')
@@ -146,7 +159,7 @@ def individual_indicator_statistics(indicator_name):
         (df_indicator["Country Name"] == "Germany") |
         (df_indicator["Country Name"] == "India") |
         (df_indicator["Country Name"] == "United States")
-        ].reset_index(drop=True)
+    ].reset_index(drop=True)
 
     # set the country name as index
     df_indicator = df_indicator.set_index("Country Name")
@@ -177,11 +190,11 @@ individual_country_statisctic('Germany')
 individual_country_statisctic('United States')
 
 # call the function to extract stat properties of each country per indicator
-individual_indicator_statistics("Population growth (annual %)")
-individual_indicator_statistics("Forest area (sq. km)")
-individual_indicator_statistics("CO2 emissions (kt)")
-individual_indicator_statistics("Agricultural land (sq. km)")
-individual_indicator_statistics("Access to electricity (% of population)")
+individual_indicator_statistics("Population growth(%)")
+individual_indicator_statistics("Forest area(km^2)")
+individual_indicator_statistics("CO2 emissions(kt)")
+individual_indicator_statistics("Agricultural land(km^2)")
+individual_indicator_statistics("Renew. energy consump(%)")
 
 # extrcact useful countries
 df_Brazil = extract_country_data('Brazil')
@@ -231,3 +244,19 @@ df_statistics = pd.DataFrame(stats)
 
 # print the summary statistics
 print(df_statistics)
+
+# create a df with usufull countries
+df_countries = ["Brazil", "China", "Germany", "India", "United States"]
+
+# create a loop to iterate over countries df
+for c in df_countries:
+
+    # extract the country data
+    df_country1 = extract_country_data(c)
+
+    # calculate the correlation
+    df_corr = df_country1.corr()
+
+    # print all correlation matrices
+    print("Correlation matrix for indicators in",
+          c, ":", "\n", "\n", df_corr, "\n")
