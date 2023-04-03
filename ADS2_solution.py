@@ -48,10 +48,10 @@ def read_climate_data(filename):
          "Renew. energy consump(%)"])
 
     # drop all unnecessary columns
-    df_climate_change = df_climate_change.drop(['Indicator Code',
-                                                'Unnamed: 66',
-                                                '2020',
-                                                '2021'], axis=1)
+    df_climate_change = df_climate_change.drop(["Indicator Code",
+                                                "Unnamed: 66",
+                                                "2020",
+                                                "2021"], axis=1)
 
     # drop the years between 1960 to 1990
     df_climate_change = df_climate_change.drop(df_climate_change.iloc[:, 3:33],
@@ -64,7 +64,7 @@ def read_climate_data(filename):
     df_year = df_climate_change.dropna(axis=0)
 
     # set the country name as index
-    df_climate_change = df_climate_change.set_index('Country Name')
+    df_climate_change = df_climate_change.set_index("Country Name")
 
     # transpose the dataframe to get countries as columns
     df_country = df_climate_change.transpose()
@@ -96,7 +96,7 @@ def extract_country_data(country_name):
     df_state.columns = df_cols
 
     # convert data types to numeric
-    df_state = df_state.apply(pd.to_numeric, errors='coerce')
+    df_state = df_state.apply(pd.to_numeric, errors="coerce")
 
     # return the dataframe
     return df_state
@@ -129,11 +129,11 @@ def individual_country_statisctic(country_name):
     ))
 
     # print the statistics
-    print('========== The summary statistics for', country_name, '===========')
-    print('\n')
+    print("========== The summary statistics for", country_name, "===========")
+    print("\n")
     print(df_describe)
-    print('==================================================================')
-    print('\n')
+    print("==================================================================")
+    print("\n")
 
     # return the statistics for each country
     return
@@ -146,7 +146,7 @@ def individual_indicator_statistics(indicator_name):
     """
 
     # extract given indicatordata
-    df_indicator = df_year[df_year['Indicator Name'] == indicator_name]
+    df_indicator = df_year[df_year["Indicator Name"] == indicator_name]
 
     # drop unneccesary columns
     df_indicator = df_indicator.drop(["Country Code", "Indicator Name"],
@@ -171,13 +171,56 @@ def individual_indicator_statistics(indicator_name):
     df_describe = df_indicator.describe().round(2)
 
     # print the statistics
-    print('========= The summary statistics for', indicator_name, '==========')
-    print('\n')
+    print("========= The summary statistics for", indicator_name, "==========")
+    print("\n")
     print(df_describe)
-    print('==================================================================')
-    print('\n')
+    print("==================================================================")
+    print("\n")
 
     # return the statistics for each country
+    return
+
+
+def plt_co2_emission_line_chart(df):
+    """ This ia a function to create a lineplot with multiple lines.
+    This function takes datafrme as an argument, and use year as x axis
+    and the total CO2 emission as y axis and plot lines for each country"""
+
+    # create dataframes for countries
+    df_brazil = df[df["Country Name"] == "Brazil"]
+    df_germany = df[df["Country Name"] == "Germany"]
+    df_china = df[df["Country Name"] == "China"]
+    df_india = df[df["Country Name"] == "India"]
+    df_USA = df[df["Country Name"] == "United States"]
+    df_UK = df[df["Country Name"] == "United Kingdom"]
+
+    # make the figure
+    plt.figure()
+
+    # use multiple x and y for plot multiple lines
+    plt.plot(df_brazil["Year"], df_brazil["Total"], label="Brazil")
+    plt.plot(df_china["Year"], df_china["Total"], label="China")
+    plt.plot(df_germany["Year"], df_germany["Total"], label="Germany")
+    plt.plot(df_india["Year"], df_india["Total"], label="India")
+    plt.plot(df_USA["Year"], df_USA["Total"], label="USA")
+    plt.plot(df_UK["Year"], df_UK["Total"], label="UK")
+
+    # labeling
+    plt.xlabel("Year", labelpad=(10), fontweight="bold")
+    plt.ylabel("Total CO2 emissions (kt)", labelpad=(10), fontweight="bold")
+
+    # add a title and legend
+    plt.title("Total CO2 emissions by country ", fontweight="bold", y=1.1)
+    plt.legend()
+
+    plt.xticks(rotation=90)
+
+    # save the plot as png
+    plt.savefig("CO2_line_chart.png")
+
+    # show the plot
+    plt.show()
+
     return
 
 
@@ -185,9 +228,9 @@ def individual_indicator_statistics(indicator_name):
 df_year, df_country = read_climate_data("Climate.csv")
 
 # call the function to extract stat properties of each indicator per state
-individual_country_statisctic('Brazil')
-individual_country_statisctic('Germany')
-individual_country_statisctic('United States')
+individual_country_statisctic("Brazil")
+individual_country_statisctic("Germany")
+individual_country_statisctic("United States")
 
 # call the function to extract stat properties of each country per indicator
 individual_indicator_statistics("Population growth(%)")
@@ -197,9 +240,9 @@ individual_indicator_statistics("Agricultural land(km^2)")
 individual_indicator_statistics("Renew. energy consump(%)")
 
 # extrcact useful countries
-df_Brazil = extract_country_data('Brazil')
-df_Germany = extract_country_data('Germany')
-df_USA = extract_country_data('United States')
+df_Brazil = extract_country_data("Brazil")
+df_Germany = extract_country_data("Germany")
+df_USA = extract_country_data("United States")
 
 # assign the columns into new dataframe
 df_bcols = df_Brazil.columns
@@ -260,3 +303,35 @@ for c in df_countries:
     # print all correlation matrices
     print("Correlation matrix for indicators in",
           c, ":", "\n", "\n", df_corr, "\n")
+
+# transform the df_year dataframe seperate years columns into one year column
+df_year_new = pd.melt(df_year,
+                      id_vars=["Country Name",
+                               "Country Code",
+                               "Indicator Name"
+                               ],
+                      value_vars=df_year.iloc[:, 3:-1].columns,
+                      var_name="Year",
+                      value_name=("Total"))
+
+# explore the new dataframe
+print(df_year_new.head())
+
+# create a list of countrues for further analysis
+countries = ["Australia", "Brazil", "Canada", "China",
+             "Germany", "India", "Japan", "United Arab Emirates",
+             "United Kingdom", "United States"]
+
+# crete new dataframe with reuqired country data
+df_countries = df_year_new.groupby(
+    'Country Name').filter(lambda x: x.name in countries)
+
+# extract data for co2 emission
+df_countries_co2 = df_countries[df_countries["Indicator Name"]
+                                == "CO2 emissions(kt)"]
+
+# explore new dataframe
+print(df_countries_co2.head())
+
+# call function to creatw=e CO2 emission multiple line chart
+plt_co2_emission_line_chart(df_countries_co2)
