@@ -139,6 +139,7 @@ def individual_country_statisctic(country_name):
     return
 
 
+# function to compare statistical properties of each countries per indicator
 def individual_indicator_statistics(indicator_name):
     """
     This function get the indicator name as an argument and produce the
@@ -181,6 +182,7 @@ def individual_indicator_statistics(indicator_name):
     return
 
 
+# function to create multiple line charts for CO2 emmission
 def plt_co2_emission_line_chart(df):
     """ This ia a function to create a lineplot with multiple lines.
     This function takes datafrme as an argument, and use year as x axis
@@ -221,6 +223,51 @@ def plt_co2_emission_line_chart(df):
     # show the plot
     plt.show()
 
+    return
+
+
+# create a fucntion for produce boxplots
+def plot_boxplot(df):
+    """ This ia a function to create boxplot. This function takes datafrme
+    as an argument, and plot boxplot for each country. """
+
+    # select useful columns for plot boxplot
+    df_pop_growth = df[["Country Name",
+                        "Total"]].reset_index(drop=True)
+
+    # create pivot table using selected columns
+    df_pop_growth_pivot = df_pop_growth.pivot(columns="Country Name",
+                                              values="Total")
+
+    # make the figure
+    plt.figure()
+
+    # plot the boxplots without outliers
+    df_pop_growth_pivot.plot(kind='box',
+                             showfliers=True,
+                             patch_artist=True,
+                             boxprops=dict(facecolor="lightblue",
+                                           color="black"),
+                             capprops=dict(color="black"),
+                             whiskerprops=dict(color="black"),
+                             medianprops=dict(color="red"))
+
+    # labeling and add title
+    plt.xlabel("Region", labelpad=(15), fontweight="bold")
+    plt.ylabel("Population growth rate (%)", labelpad=(15), fontweight="bold")
+    plt.title("Distribution of population growth rate by country",
+              fontweight="bold",
+              y=1.1)
+
+    plt.xticks(rotation=90)
+
+    # save the plot as png
+    plt.savefig("pop_growth_boxplot.png")
+
+    # show the plot
+    plt.show()
+
+    # end the function
     return
 
 
@@ -319,8 +366,7 @@ print(df_year_new.head())
 
 # create a list of countrues for further analysis
 countries = ["Australia", "Brazil", "Canada", "China",
-             "Germany", "India", "Japan", "United Arab Emirates",
-             "United Kingdom", "United States"]
+             "Germany", "India", "Japan", "United Kingdom", "United States"]
 
 # crete new dataframe with reuqired country data
 df_countries = df_year_new.groupby(
@@ -333,5 +379,16 @@ df_countries_co2 = df_countries[df_countries["Indicator Name"]
 # explore new dataframe
 print(df_countries_co2.head())
 
-# call function to creatw=e CO2 emission multiple line chart
+# extract data for population growth
+df_countries_pop_growth = df_countries[
+    df_countries['Indicator Name'] == "Population growth(%)"
+]
+
+# explore new dataframe
+df_countries_pop_growth
+
+# call function to create CO2 emission multiple line chart
 plt_co2_emission_line_chart(df_countries_co2)
+
+# call function to create population growth boxplots
+plot_boxplot(df_countries_pop_growth)
