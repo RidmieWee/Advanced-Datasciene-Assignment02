@@ -271,6 +271,83 @@ def plot_boxplot(df):
     return
 
 
+# create a function for plot bar chart
+def plot_bar_graph(df):
+    """ This ia a function to create a grouped bar chart.
+    This function takes datafrme as anargument, and plot
+    multiple bars grouped by country. """
+
+    # create dataframes for plot bar graph
+    df_1990 = df[df["Year"] == "1990"]
+    df_1995 = df[df["Year"] == "1995"]
+    df_2000 = df[df["Year"] == "2000"]
+    df_2005 = df[df["Year"] == "2005"]
+    df_2010 = df[df["Year"] == "2010"]
+    df_2015 = df[df["Year"] == "2015"]
+
+    # make the figure
+    plt.figure()
+
+    # create the position of bars
+    x_pos = np.arange(len(df_1990))
+
+    # create x labels
+    tick_labels = ["Australia", "Brazil", "Canada",
+                   "China", "Germny", "India", "Japan", "UK", "USA"]
+
+    # plot the bars
+    plt.bar(x_pos - 0.2,
+            df_1990["Total"],
+            width=0.1,
+            label="1990",
+            color="#0b84a5")
+    plt.bar(x_pos - 0.1,
+            df_1995["Total"],
+            width=0.1,
+            label="1995",
+            color="#f6c85f")
+    plt.bar(x_pos,
+            df_2000["Total"],
+            width=0.1,
+            label="2000",
+            color="#9dd866")
+    plt.bar(x_pos + 0.1,
+            df_2005["Total"],
+            width=0.1,
+            label="2005",
+            color="#ca472f")
+    plt.bar(x_pos + 0.2,
+            df_2010["Total"],
+            width=0.1,
+            label="2010",
+            color="#8dddd0")
+    plt.bar(x_pos + 0.3,
+            df_2015["Total"],
+            width=0.1,
+            label="2015",
+            color="#6f4e7c")
+
+    # labeling
+    plt.xlabel("Country", labelpad=(10), fontweight="bold")
+    plt.ylabel("Renewable energy consumption(% energy consump.)",
+               fontsize=(8), labelpad=(10), fontweight="bold")
+    plt.xticks(x_pos, tick_labels, rotation=90)
+
+    # add the title and legends
+    plt.title("Renewable energy consumption by country",
+              fontweight="bold", y=1.1)
+    plt.legend()
+
+    # save the figure as png
+    plt.savefig("renew_energy_bar_chart.png")
+
+    # show the plot
+    plt.show()
+
+    # end the function
+    return
+
+
 # call the function for read file and generate 2 dataframes
 df_year, df_country = read_climate_data("Climate.csv")
 
@@ -381,14 +458,29 @@ print(df_countries_co2.head())
 
 # extract data for population growth
 df_countries_pop_growth = df_countries[
-    df_countries['Indicator Name'] == "Population growth(%)"
+    df_countries["Indicator Name"] == "Population growth(%)"
 ]
 
+# change some country names into aabbreviations
+df_countries_pop_growth.loc[df_countries_pop_growth["Country Name"]
+                            == "United States", "Country Name"] = "USA"
+df_countries_pop_growth.loc[df_countries_pop_growth["Country Name"]
+                            == "United Kingdom", "Country Name"] = "UK"
+
+
 # explore new dataframe
-df_countries_pop_growth
+print(df_countries_pop_growth)
+
+# extrace data for renew. energy comsump.
+df_countries_renew_energy = df_countries[
+    df_countries['Indicator Name'] == "Renew. energy consump(%)"
+    ].sort_values(by="Country Name", ascending=True)
 
 # call function to create CO2 emission multiple line chart
 plt_co2_emission_line_chart(df_countries_co2)
 
 # call function to create population growth boxplots
 plot_boxplot(df_countries_pop_growth)
+
+# call function to create renew. energy consumption bar charts
+plot_bar_graph(df_countries_renew_energy)
