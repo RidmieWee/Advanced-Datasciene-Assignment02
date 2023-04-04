@@ -348,6 +348,126 @@ def plot_bar_graph(df):
     return
 
 
+# function to create multiple line charts for forest area
+def plot_forest_area_line_chart(df):
+    """ This ia a function to create a lineplot with multiple lines.
+    This function takes datafrme as an argument, and use year as x axis
+    and the total forest area as y axis and plot dashed lines for each country"""
+
+    # create dataframes for countries
+    df_aus = df[df["Country Name"] == "Australia"]
+    df_brazil = df[df["Country Name"] == "Brazil"]
+    df_canada = df[df["Country Name"] == "Canada"]
+    df_china = df[df["Country Name"] == "China"]
+    df_germany = df[df["Country Name"] == "Germany"]
+    df_india = df[df["Country Name"] == "India"]
+    df_japan = df[df["Country Name"] == "Japan"]
+    df_USA = df[df["Country Name"] == "United States"]
+    df_UK = df[df["Country Name"] == "United Kingdom"]
+
+    # make the figure
+    plt.figure()
+
+    # use multiple x and y for plot multiple lines
+    plt.plot(df_aus["Year"], df_aus["Total"],
+             linestyle='dashed', label="Australia")
+    plt.plot(df_brazil["Year"], df_brazil["Total"],
+             linestyle='dashed', label="Brazil")
+    plt.plot(df_canada["Year"], df_canada["Total"],
+             linestyle='dashed', label="Canada")
+    plt.plot(df_china["Year"], df_china["Total"],
+             linestyle='dashed', label="China")
+    plt.plot(df_germany["Year"], df_germany["Total"],
+             linestyle='dashed', label="Germany")
+    plt.plot(df_india["Year"], df_india["Total"],
+             linestyle='dashed', label="India")
+    plt.plot(df_japan["Year"], df_japan["Total"],
+             linestyle='dashed', label="Japan")
+    plt.plot(df_USA["Year"], df_USA["Total"], linestyle='dashed', label="USA")
+    plt.plot(df_UK["Year"], df_UK["Total"], linestyle='dashed', label="UK")
+
+    # labeling
+    plt.xlabel("Year", labelpad=(10), fontweight="bold")
+    plt.ylabel("Forest area (sq. km)", labelpad=(10), fontweight="bold")
+
+    # add a title and legend
+    plt.title("Total forest area by country ", fontweight="bold", y=1.1)
+    plt.legend(loc='center left',
+               bbox_to_anchor=(1, 0.5),
+               fancybox=True,
+               shadow=True)
+
+    plt.xticks(rotation=90)
+
+    # save the plot as png
+    plt.savefig("CO2_line_chart.png")
+
+    # show the plot
+    plt.show()
+
+    return
+
+
+# function to create multiple line charts for CO2 emmission
+def plot_aggri_land_line_chart(df):
+    """ This ia a function to create a lineplot with multiple lines.
+    This function takes datafrme as an argument, and use year as x axis
+    and the total aggri. land as y axis and plot dashed lines for each country"""
+
+    # create dataframes for countries
+    df_aus = df[df["Country Name"] == "Australia"]
+    df_brazil = df[df["Country Name"] == "Brazil"]
+    df_canada = df[df["Country Name"] == "Canada"]
+    df_china = df[df["Country Name"] == "China"]
+    df_germany = df[df["Country Name"] == "Germany"]
+    df_india = df[df["Country Name"] == "India"]
+    df_japan = df[df["Country Name"] == "Japan"]
+    df_USA = df[df["Country Name"] == "United States"]
+    df_UK = df[df["Country Name"] == "United Kingdom"]
+
+    # make the figure
+    plt.figure()
+
+    # use multiple x and y for plot multiple lines
+    plt.plot(df_aus["Year"], df_aus["Total"],
+             linestyle='dashed', label="Australia")
+    plt.plot(df_brazil["Year"], df_brazil["Total"],
+             linestyle='dashed', label="Brazil")
+    plt.plot(df_canada["Year"], df_canada["Total"],
+             linestyle='dashed', label="Canada")
+    plt.plot(df_china["Year"], df_china["Total"],
+             linestyle='dashed', label="China")
+    plt.plot(df_germany["Year"], df_germany["Total"],
+             linestyle='dashed', label="Germany")
+    plt.plot(df_india["Year"], df_india["Total"],
+             linestyle='dashed', label="India")
+    plt.plot(df_japan["Year"], df_japan["Total"],
+             linestyle='dashed', label="Japa")
+    plt.plot(df_USA["Year"], df_USA["Total"], linestyle='dashed', label="USA")
+    plt.plot(df_UK["Year"], df_UK["Total"], linestyle='dashed', label="UK")
+
+    # labeling
+    plt.xlabel("Year", labelpad=(10), fontweight="bold")
+    plt.ylabel("Aggricultural land (sq. km)", labelpad=(10), fontweight="bold")
+
+    # add a title and legend
+    plt.title("Total aggricultural land by country ", fontweight="bold", y=1.1)
+    plt.legend(loc='center left',
+               bbox_to_anchor=(1, 0.5),
+               fancybox=True,
+               shadow=True)
+
+    plt.xticks(rotation=90)
+
+    # save the plot as png
+    plt.savefig("CO2_line_chart.png")
+
+    # show the plot
+    plt.show()
+
+    return
+
+
 # call the function for read file and generate 2 dataframes
 df_year, df_country = read_climate_data("Climate.csv")
 
@@ -469,12 +589,29 @@ df_countries_pop_growth.loc[df_countries_pop_growth["Country Name"]
 
 
 # explore new dataframe
-print(df_countries_pop_growth)
+print(df_countries_pop_growth.head())
 
 # extrace data for renew. energy comsump.
 df_countries_renew_energy = df_countries[
     df_countries['Indicator Name'] == "Renew. energy consump(%)"
-    ].sort_values(by="Country Name", ascending=True)
+].sort_values(by="Country Name", ascending=True)
+
+# explore new dataframe
+print(df_countries_renew_energy.head())
+
+# extrace data for forest area
+df_countries_forest = df_countries[df_countries["Indicator Name"]
+                                   == "Forest area(km^2)"]
+
+# explore new dataframe
+print(df_countries_forest.head())
+
+# extrace data for aggricultural land
+df_countries_aggri = df_countries[df_countries["Indicator Name"] ==
+                                  "Agricultural land(km^2)"]
+
+# explore new dataframe
+print(df_countries_aggri)
 
 # call function to create CO2 emission multiple line chart
 plt_co2_emission_line_chart(df_countries_co2)
@@ -484,3 +621,9 @@ plot_boxplot(df_countries_pop_growth)
 
 # call function to create renew. energy consumption bar charts
 plot_bar_graph(df_countries_renew_energy)
+
+# call function to create forest area multiple dashed line charts
+plot_forest_area_line_chart(df_countries_forest)
+
+# call function to create forest area multiple dashed line charts
+plot_aggri_land_line_chart(df_countries_aggri)
