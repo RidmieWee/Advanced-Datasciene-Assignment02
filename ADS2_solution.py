@@ -9,6 +9,7 @@ Created on Sat Mar 25 17:33:38 2023
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 import warnings
 
 from scipy.stats import skew, kurtosis
@@ -229,7 +230,7 @@ def plt_co2_emission_line_chart(df):
     return
 
 
-# function to create multiple line charts for CO2 emmission
+# function to create multiple line charts for urban population
 def plot_urban_pop_line_chart(df):
     """ This ia a function to create a lineplot with multiple lines.
     This function takes datafrme as an argument, and use year as x axis
@@ -240,8 +241,8 @@ def plot_urban_pop_line_chart(df):
     df_germany = df[df["Country Name"] == "Germany"]
     df_china = df[df["Country Name"] == "China"]
     df_india = df[df["Country Name"] == "India"]
-    df_USA = df[df["Country Name"] == "United States"]
-    df_UK = df[df["Country Name"] == "United Kingdom"]
+    df_USA = df[df["Country Name"] == "USA"]
+    df_UK = df[df["Country Name"] == "UK"]
 
     # make the figure
     plt.figure()
@@ -444,7 +445,7 @@ def plot_arable_land_line_chart(df):
     plt.plot(df_india["Year"], df_india["Total"],
              linestyle='dashed', label="India")
     plt.plot(df_japan["Year"], df_japan["Total"],
-             linestyle='dashed', label="Japa")
+             linestyle='dashed', label="Japan")
     plt.plot(df_USA["Year"], df_USA["Total"], linestyle='dashed', label="USA")
     plt.plot(df_UK["Year"], df_UK["Total"], linestyle='dashed', label="UK")
 
@@ -463,6 +464,66 @@ def plot_arable_land_line_chart(df):
 
     # save the plot as png
     plt.savefig("arable_line_chart.png")
+
+    # show the plot
+    plt.show()
+
+    return
+
+
+def plot_heat_map(country_name):
+    """ This ia a function to create a heatmap for country specific indicators.
+    This function takes country as an argument, and use plot correlation between indicators"""
+
+    # extract the given country data
+    df_data = extract_country_data(country_name)
+
+    # create correlation matrix
+    corr_matrix = df_data.corr()
+
+    # plot heatmap
+    sns.heatmap(corr_matrix, cmap='coolwarm', annot=True)
+
+    # rotate the x-axis labels by 45 degrees
+    plt.xticks(rotation=45)
+
+    # set the plot title
+    plt.title('Correlation between Indicators in ' + country_name, fontweight="bold", y=1.05)
+    plt.xlabel("")
+    plt.ylabel("")
+
+    # save the plot as png
+    plt.savefig("heat_map.png")
+
+    # show the plot
+    plt.show()
+
+    return
+
+
+def plot_heat_map2(country_name):
+    """ This ia a function to create a heatmap for country specific indicators.
+    This function takes country as an argument, and use plot correlation between indicators"""
+
+    # extract the given country data
+    df_data = extract_country_data(country_name)
+
+    # create correlation matrix
+    corr_matrix = df_data.corr()
+
+    # plot heatmap
+    sns.heatmap(corr_matrix, cmap='YlGnBu', annot=True)
+
+    # rotate the x-axis labels by 45 degrees
+    plt.xticks(rotation=45)
+
+    # set the plot title
+    plt.title('Correlation between Indicators in ' + country_name, fontweight="bold", y=1.05)
+    plt.xlabel("")
+    plt.ylabel("")
+
+    # save the plot as png
+    plt.savefig("heat_map2.png")
 
     # show the plot
     plt.show()
@@ -629,3 +690,8 @@ plot_forest_area_line_chart(df_countries_forest)
 
 # call function to create forest area multiple dashed line charts
 plot_arable_land_line_chart(df_countries_arable)
+
+# call the function to create correlation heatmap for china and USA
+plot_heat_map("China")
+plot_heat_map2("United States")
+
