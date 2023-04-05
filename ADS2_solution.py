@@ -14,6 +14,7 @@ import warnings
 
 from scipy.stats import skew, kurtosis
 
+
 # =============================================================================
 # This senction consist of all the functions
 # =============================================================================
@@ -586,6 +587,7 @@ def plot_heat_map2(country_name):
 
     # end the function
     return
+
 
 # =============================================================================
 # This section is the main program of this code. In here all the pre
