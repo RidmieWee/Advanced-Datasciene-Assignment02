@@ -14,6 +14,10 @@ import warnings
 
 from scipy.stats import skew, kurtosis
 
+# =============================================================================
+# This senction consist of all the functions
+# =============================================================================
+
 
 # create function for read file
 def read_climate_data(filename):
@@ -183,6 +187,52 @@ def individual_indicator_statistics(indicator_name):
     return
 
 
+# function to get correlation over time
+def correlation_per_year(country_name):
+    """
+    This function get the country name as an argument and produce the
+    correlation over time for selected indicators
+    """
+
+    # define the window size
+    window_size = 5
+
+    # extract the country data
+    df_data = df_countries[df_countries["Country Name"] == country_name]
+
+    # filter the dataframe for the indicators you want to analyze
+    indicators = ['Urban population',
+                  'Forest area(%)',
+                  'CO2 emissions(mt)',
+                  'Forest area(%)',
+                  'Arable land(%)']
+
+    df_filtered = df_data[df_data['Indicator Name'].isin(indicators)]
+
+    df_filtered['Year'] = df_filtered['Year'].astype(int)
+
+    # pivot the dataframe to have year as index and indicators as columns
+    df_pivot = df_filtered.pivot(index='Year',
+                                 columns='Indicator Name',
+                                 values='Total')
+
+    # calculate the correlation matrix for each rolling window
+    corr_matrix_over_time = df_pivot.rolling(window_size).corr()
+
+    # select only the correlations between different indicators
+    corr_matrix_over_time = corr_matrix_over_time.unstack().iloc[:,
+                                                                 window_size-4::window_size]
+
+    # drop null values
+    corr_matrix_over_time.dropna()
+
+    # print the result
+    print(corr_matrix_over_time)
+
+    # end the function
+    return
+
+
 # function to create multiple line charts for CO2 emmission
 def plt_co2_emission_line_chart(df):
     """ This ia a function to create a lineplot with multiple lines.
@@ -227,6 +277,7 @@ def plt_co2_emission_line_chart(df):
     # show the plot
     plt.show()
 
+    # end the function
     return
 
 
@@ -271,6 +322,7 @@ def plot_urban_pop_line_chart(df):
     # show the plot
     plt.show()
 
+    # end the function
     return
 
 
@@ -379,14 +431,14 @@ def plot_forest_area_line_chart(df):
     plt.plot(df_canada["Year"], df_canada["Total"],
              linestyle='dashed', label="Canada")
     plt.plot(df_china["Year"], df_china["Total"],
-             linestyle='dashed', label="China")
+             label="China")
     plt.plot(df_germany["Year"], df_germany["Total"],
              linestyle='dashed', label="Germany")
     plt.plot(df_india["Year"], df_india["Total"],
              linestyle='dashed', label="India")
     plt.plot(df_japan["Year"], df_japan["Total"],
              linestyle='dashed', label="Japan")
-    plt.plot(df_USA["Year"], df_USA["Total"], linestyle='dashed', label="USA")
+    plt.plot(df_USA["Year"], df_USA["Total"], label="USA")
     plt.plot(df_UK["Year"], df_UK["Total"], linestyle='dashed', label="UK")
 
     # labeling
@@ -408,6 +460,7 @@ def plot_forest_area_line_chart(df):
     # show the plot
     plt.show()
 
+    # end the function
     return
 
 
@@ -438,15 +491,14 @@ def plot_arable_land_line_chart(df):
              linestyle='dashed', label="Brazil")
     plt.plot(df_canada["Year"], df_canada["Total"],
              linestyle='dashed', label="Canada")
-    plt.plot(df_china["Year"], df_china["Total"],
-             linestyle='dashed', label="China")
+    plt.plot(df_china["Year"], df_china["Total"], label="China")
     plt.plot(df_germany["Year"], df_germany["Total"],
              linestyle='dashed', label="Germany")
     plt.plot(df_india["Year"], df_india["Total"],
              linestyle='dashed', label="India")
     plt.plot(df_japan["Year"], df_japan["Total"],
              linestyle='dashed', label="Japan")
-    plt.plot(df_USA["Year"], df_USA["Total"], linestyle='dashed', label="USA")
+    plt.plot(df_USA["Year"], df_USA["Total"], label="USA")
     plt.plot(df_UK["Year"], df_UK["Total"], linestyle='dashed', label="UK")
 
     # labeling
@@ -468,6 +520,7 @@ def plot_arable_land_line_chart(df):
     # show the plot
     plt.show()
 
+    # end the function
     return
 
 
@@ -488,7 +541,8 @@ def plot_heat_map(country_name):
     plt.xticks(rotation=45)
 
     # set the plot title
-    plt.title('Correlation between Indicators in ' + country_name, fontweight="bold", y=1.05)
+    plt.title('Correlation between Indicators in ' +
+              country_name, fontweight="bold", y=1.05)
     plt.xlabel("")
     plt.ylabel("")
 
@@ -498,6 +552,7 @@ def plot_heat_map(country_name):
     # show the plot
     plt.show()
 
+    # end the function
     return
 
 
@@ -518,7 +573,8 @@ def plot_heat_map2(country_name):
     plt.xticks(rotation=45)
 
     # set the plot title
-    plt.title('Correlation between Indicators in ' + country_name, fontweight="bold", y=1.05)
+    plt.title('Correlation between Indicators in ' +
+              country_name, fontweight="bold", y=1.05)
     plt.xlabel("")
     plt.ylabel("")
 
@@ -528,7 +584,13 @@ def plot_heat_map2(country_name):
     # show the plot
     plt.show()
 
+    # end the function
     return
+
+# =============================================================================
+# This section is the main program of this code. In here all the pre
+# processing requirements and calling functions done
+# =============================================================================
 
 
 # call the function for read file and generate 2 dataframes
@@ -646,9 +708,9 @@ df_countries_urb_pop = df_countries[
 
 # change some country names into aabbreviations
 df_countries_urb_pop.loc[df_countries_urb_pop["Country Name"]
-                            == "United States", "Country Name"] = "USA"
+                         == "United States", "Country Name"] = "USA"
 df_countries_urb_pop.loc[df_countries_urb_pop["Country Name"]
-                            == "United Kingdom", "Country Name"] = "UK"
+                         == "United Kingdom", "Country Name"] = "UK"
 
 
 # explore new dataframe
@@ -671,7 +733,7 @@ print(df_countries_forest.head())
 
 # extrace data for aggricultural land
 df_countries_arable = df_countries[df_countries["Indicator Name"] ==
-                                  "Arable land(%)"]
+                                   "Arable land(%)"]
 
 # explore new dataframe
 print(df_countries_arable)
@@ -694,4 +756,3 @@ plot_arable_land_line_chart(df_countries_arable)
 # call the function to create correlation heatmap for china and USA
 plot_heat_map("China")
 plot_heat_map2("United States")
-
