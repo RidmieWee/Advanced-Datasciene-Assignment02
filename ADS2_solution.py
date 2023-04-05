@@ -16,7 +16,7 @@ from scipy.stats import skew, kurtosis
 
 
 # =============================================================================
-# This senction consist of all the functions
+# This section consist of all the function definitions
 # =============================================================================
 
 
@@ -286,7 +286,8 @@ def plt_co2_emission_line_chart(df):
 def plot_urban_pop_line_chart(df):
     """ This ia a function to create a lineplot with multiple lines.
     This function takes datafrme as an argument, and use year as x axis
-    and the total urban population n as y axis and plot lines for each country"""
+    and the total urban population n as y axis and plot lines for
+    each country"""
 
     # create dataframes for countries
     df_brazil = df[df["Country Name"] == "Brazil"]
@@ -408,7 +409,8 @@ def plot_renew_energy_bar_graph(df):
 def plot_forest_area_line_chart(df):
     """ This ia a function to create a lineplot with multiple lines.
     This function takes datafrme as an argument, and use year as x axis
-    and the total forest area as y axis and plot dashed lines for each country"""
+    and the total forest area as y axis and plot dashed lines for
+    each country"""
 
     # create dataframes for countries
     df_aus = df[df["Country Name"] == "Australia"]
@@ -425,22 +427,40 @@ def plot_forest_area_line_chart(df):
     plt.figure()
 
     # use multiple x and y for plot multiple lines
-    plt.plot(df_aus["Year"], df_aus["Total"],
-             linestyle='dashed', label="Australia")
-    plt.plot(df_brazil["Year"], df_brazil["Total"],
-             linestyle='dashed', label="Brazil")
-    plt.plot(df_canada["Year"], df_canada["Total"],
-             linestyle='dashed', label="Canada")
-    plt.plot(df_china["Year"], df_china["Total"],
+    plt.plot(df_aus["Year"],
+             df_aus["Total"],
+             linestyle='dashed',
+             label="Australia")
+    plt.plot(df_brazil["Year"],
+             df_brazil["Total"],
+             linestyle='dashed',
+             label="Brazil")
+    plt.plot(df_canada["Year"],
+             df_canada["Total"],
+             linestyle='dashed',
+             label="Canada")
+    plt.plot(df_china["Year"],
+             df_china["Total"],
              label="China")
-    plt.plot(df_germany["Year"], df_germany["Total"],
-             linestyle='dashed', label="Germany")
-    plt.plot(df_india["Year"], df_india["Total"],
-             linestyle='dashed', label="India")
-    plt.plot(df_japan["Year"], df_japan["Total"],
-             linestyle='dashed', label="Japan")
-    plt.plot(df_USA["Year"], df_USA["Total"], label="USA")
-    plt.plot(df_UK["Year"], df_UK["Total"], linestyle='dashed', label="UK")
+    plt.plot(df_germany["Year"],
+             df_germany["Total"],
+             linestyle='dashed',
+             label="Germany")
+    plt.plot(df_india["Year"],
+             df_india["Total"],
+             linestyle='dashed',
+             label="India")
+    plt.plot(df_japan["Year"],
+             df_japan["Total"],
+             linestyle='dashed',
+             label="Japan")
+    plt.plot(df_USA["Year"],
+             df_USA["Total"],
+             label="USA")
+    plt.plot(df_UK["Year"],
+             df_UK["Total"],
+             linestyle='dashed',
+             label="UK")
 
     # labeling
     plt.xlabel("Year", labelpad=(10), fontweight="bold")
@@ -469,7 +489,8 @@ def plot_forest_area_line_chart(df):
 def plot_arable_land_line_chart(df):
     """ This ia a function to create a lineplot with multiple lines.
     This function takes datafrme as an argument, and use year as x axis
-    and the total aggri. land as y axis and plot dashed lines for each country"""
+    and the total aggri. land as y axis and plot dashed lines for
+    each country"""
 
     # create dataframes for countries
     df_aus = df[df["Country Name"] == "Australia"]
@@ -527,7 +548,8 @@ def plot_arable_land_line_chart(df):
 
 def plot_heat_map(country_name):
     """ This ia a function to create a heatmap for country specific indicators.
-    This function takes country as an argument, and use plot correlation between indicators"""
+    This function takes country as an argument, and use plot correlation
+    between indicators"""
 
     # extract the given country data
     df_data = extract_country_data(country_name)
@@ -559,7 +581,8 @@ def plot_heat_map(country_name):
 
 def plot_heat_map2(country_name):
     """ This ia a function to create a heatmap for country specific indicators.
-    This function takes country as an argument, and use plot correlation between indicators"""
+    This function takes country as an argument, and use plot correlation
+    between indicators"""
 
     # extract the given country data
     df_data = extract_country_data(country_name)
@@ -574,8 +597,9 @@ def plot_heat_map2(country_name):
     plt.xticks(rotation=45)
 
     # set the plot title
-    plt.title('Correlation between Indicators in ' +
-              country_name, fontweight="bold", y=1.05)
+    plt.title('Correlation between Indicators in ' + country_name,
+              fontweight="bold",
+              y=1.05)
     plt.xlabel("")
     plt.ylabel("")
 
@@ -591,7 +615,7 @@ def plot_heat_map2(country_name):
 
 # =============================================================================
 # This section is the main program of this code. In here all the pre
-# processing requirements and calling functions done
+# processing requirements, statistical comparisons and calling functions done
 # =============================================================================
 
 
@@ -749,10 +773,10 @@ plot_urban_pop_line_chart(df_countries_urb_pop)
 # call function to create renew. energy consumption bar charts
 plot_renew_energy_bar_graph(df_countries_renew_energy)
 
-# call function to create forest area multiple dashed line charts
+# call function to create forest area multiple line charts
 plot_forest_area_line_chart(df_countries_forest)
 
-# call function to create forest area multiple dashed line charts
+# call function to create forest area multiple line charts
 plot_arable_land_line_chart(df_countries_arable)
 
 # call the function to create correlation heatmap for china and USA
