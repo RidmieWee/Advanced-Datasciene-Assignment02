@@ -27,24 +27,24 @@ def read_climate_data(filename):
 
     # create a new dataframe to filter five usefull indicators
     df_climate_change = df_data[
-        (df_data["Indicator Name"] == "Population growth (annual %)") |
-        (df_data["Indicator Name"] == "Forest area (sq. km)") |
-        (df_data["Indicator Name"] == "CO2 emissions (kt)") |
-        (df_data["Indicator Name"] == "Agricultural land (sq. km)") |
+        (df_data["Indicator Name"] == "Urban population") |
+        (df_data["Indicator Name"] == "Forest area (% of land area)") |
+        (df_data["Indicator Name"] == "CO2 emissions (metric tons per capita)") |
+        (df_data["Indicator Name"] == "Arable land (% of land area)") |
         (df_data["Indicator Name"] ==
          "Renewable energy consumption (% of total final energy consumption)")
     ].reset_index(drop=True)
 
     df_climate_change["Indicator Name"] = df_climate_change["Indicator Name"].replace(
-        ["Population growth (annual %)",
-         "Forest area (sq. km)",
-         "CO2 emissions (kt)",
-         "Agricultural land (sq. km)",
+        ["Urban population",
+         "Forest area (% of land area)",
+         "CO2 emissions (metric tons per capita)",
+         "Arable land (% of land area)",
          "Renewable energy consumption (% of total final energy consumption)"],
-        ["Population growth(%)",
-         "Forest area(km^2)",
-         "CO2 emissions(kt)",
-         "Agricultural land(km^2)",
+        ["Urban population",
+         "Forest area(%)",
+         "CO2 emissions(mt)",
+         "Arable land(%)",
          "Renew. energy consump(%)"])
 
     # drop all unnecessary columns
@@ -209,11 +209,14 @@ def plt_co2_emission_line_chart(df):
 
     # labeling
     plt.xlabel("Year", labelpad=(10), fontweight="bold")
-    plt.ylabel("Total CO2 emissions (kt)", labelpad=(10), fontweight="bold")
+    plt.ylabel("CO2 emissions (mt)", labelpad=(10), fontweight="bold")
 
     # add a title and legend
     plt.title("Total CO2 emissions by country ", fontweight="bold", y=1.1)
-    plt.legend()
+    plt.legend(loc='center left',
+               bbox_to_anchor=(1, 0.5),
+               fancybox=True,
+               shadow=True)
 
     plt.xticks(rotation=90)
 
@@ -226,53 +229,52 @@ def plt_co2_emission_line_chart(df):
     return
 
 
-# create a fucntion for produce boxplots
-def plot_boxplot(df):
-    """ This ia a function to create boxplot. This function takes datafrme
-    as an argument, and plot boxplot for each country. """
+# function to create multiple line charts for CO2 emmission
+def plot_urban_pop_line_chart(df):
+    """ This ia a function to create a lineplot with multiple lines.
+    This function takes datafrme as an argument, and use year as x axis
+    and the total urban population n as y axis and plot lines for each country"""
 
-    # select useful columns for plot boxplot
-    df_pop_growth = df[["Country Name",
-                        "Total"]].reset_index(drop=True)
-
-    # create pivot table using selected columns
-    df_pop_growth_pivot = df_pop_growth.pivot(columns="Country Name",
-                                              values="Total")
+    # create dataframes for countries
+    df_brazil = df[df["Country Name"] == "Brazil"]
+    df_germany = df[df["Country Name"] == "Germany"]
+    df_china = df[df["Country Name"] == "China"]
+    df_india = df[df["Country Name"] == "India"]
+    df_USA = df[df["Country Name"] == "United States"]
+    df_UK = df[df["Country Name"] == "United Kingdom"]
 
     # make the figure
     plt.figure()
 
-    # plot the boxplots without outliers
-    df_pop_growth_pivot.plot(kind='box',
-                             showfliers=True,
-                             patch_artist=True,
-                             boxprops=dict(facecolor="lightblue",
-                                           color="black"),
-                             capprops=dict(color="black"),
-                             whiskerprops=dict(color="black"),
-                             medianprops=dict(color="red"))
+    # use multiple x and y for plot multiple lines
+    plt.plot(df_brazil["Year"], df_brazil["Total"], label="Brazil")
+    plt.plot(df_china["Year"], df_china["Total"], label="China")
+    plt.plot(df_germany["Year"], df_germany["Total"], label="Germany")
+    plt.plot(df_india["Year"], df_india["Total"], label="India")
+    plt.plot(df_USA["Year"], df_USA["Total"], label="USA")
+    plt.plot(df_UK["Year"], df_UK["Total"], label="UK")
 
-    # labeling and add title
-    plt.xlabel("Region", labelpad=(15), fontweight="bold")
-    plt.ylabel("Population growth rate (%)", labelpad=(15), fontweight="bold")
-    plt.title("Distribution of population growth rate by country",
-              fontweight="bold",
-              y=1.1)
+    # labeling
+    plt.xlabel("Year", labelpad=(10), fontweight="bold")
+    plt.ylabel("Population", labelpad=(10), fontweight="bold")
+
+    # add a title and legend
+    plt.title("Urban population by country ", fontweight="bold", y=1.1)
+    plt.legend()
 
     plt.xticks(rotation=90)
 
     # save the plot as png
-    plt.savefig("pop_growth_boxplot.png")
+    plt.savefig("Urb_line_chart.png")
 
     # show the plot
     plt.show()
 
-    # end the function
     return
 
 
 # create a function for plot bar chart
-def plot_bar_graph(df):
+def plot_renew_energy_bar_graph(df):
     """ This ia a function to create a grouped bar chart.
     This function takes datafrme as anargument, and plot
     multiple bars grouped by country. """
@@ -388,7 +390,7 @@ def plot_forest_area_line_chart(df):
 
     # labeling
     plt.xlabel("Year", labelpad=(10), fontweight="bold")
-    plt.ylabel("Forest area (sq. km)", labelpad=(10), fontweight="bold")
+    plt.ylabel("Forest area (%)", labelpad=(10), fontweight="bold")
 
     # add a title and legend
     plt.title("Total forest area by country ", fontweight="bold", y=1.1)
@@ -400,7 +402,7 @@ def plot_forest_area_line_chart(df):
     plt.xticks(rotation=90)
 
     # save the plot as png
-    plt.savefig("CO2_line_chart.png")
+    plt.savefig("forest_line_chart.png")
 
     # show the plot
     plt.show()
@@ -409,7 +411,7 @@ def plot_forest_area_line_chart(df):
 
 
 # function to create multiple line charts for CO2 emmission
-def plot_aggri_land_line_chart(df):
+def plot_arable_land_line_chart(df):
     """ This ia a function to create a lineplot with multiple lines.
     This function takes datafrme as an argument, and use year as x axis
     and the total aggri. land as y axis and plot dashed lines for each country"""
@@ -448,10 +450,10 @@ def plot_aggri_land_line_chart(df):
 
     # labeling
     plt.xlabel("Year", labelpad=(10), fontweight="bold")
-    plt.ylabel("Aggricultural land (sq. km)", labelpad=(10), fontweight="bold")
+    plt.ylabel("Arable land (%)", labelpad=(10), fontweight="bold")
 
     # add a title and legend
-    plt.title("Total aggricultural land by country ", fontweight="bold", y=1.1)
+    plt.title("Total arable land by country ", fontweight="bold", y=1.1)
     plt.legend(loc='center left',
                bbox_to_anchor=(1, 0.5),
                fancybox=True,
@@ -460,7 +462,7 @@ def plot_aggri_land_line_chart(df):
     plt.xticks(rotation=90)
 
     # save the plot as png
-    plt.savefig("CO2_line_chart.png")
+    plt.savefig("arable_line_chart.png")
 
     # show the plot
     plt.show()
@@ -477,10 +479,10 @@ individual_country_statisctic("Germany")
 individual_country_statisctic("United States")
 
 # call the function to extract stat properties of each country per indicator
-individual_indicator_statistics("Population growth(%)")
-individual_indicator_statistics("Forest area(km^2)")
-individual_indicator_statistics("CO2 emissions(kt)")
-individual_indicator_statistics("Agricultural land(km^2)")
+individual_indicator_statistics("Urban population")
+individual_indicator_statistics("Forest area(%)")
+individual_indicator_statistics("CO2 emissions(mt)")
+individual_indicator_statistics("Arable land(%)")
 individual_indicator_statistics("Renew. energy consump(%)")
 
 # extrcact useful countries
@@ -571,25 +573,25 @@ df_countries = df_year_new.groupby(
 
 # extract data for co2 emission
 df_countries_co2 = df_countries[df_countries["Indicator Name"]
-                                == "CO2 emissions(kt)"]
+                                == "CO2 emissions(mt)"]
 
 # explore new dataframe
 print(df_countries_co2.head())
 
 # extract data for population growth
-df_countries_pop_growth = df_countries[
-    df_countries["Indicator Name"] == "Population growth(%)"
+df_countries_urb_pop = df_countries[
+    df_countries["Indicator Name"] == "Urban population"
 ]
 
 # change some country names into aabbreviations
-df_countries_pop_growth.loc[df_countries_pop_growth["Country Name"]
+df_countries_urb_pop.loc[df_countries_urb_pop["Country Name"]
                             == "United States", "Country Name"] = "USA"
-df_countries_pop_growth.loc[df_countries_pop_growth["Country Name"]
+df_countries_urb_pop.loc[df_countries_urb_pop["Country Name"]
                             == "United Kingdom", "Country Name"] = "UK"
 
 
 # explore new dataframe
-print(df_countries_pop_growth.head())
+print(df_countries_urb_pop.head())
 
 # extrace data for renew. energy comsump.
 df_countries_renew_energy = df_countries[
@@ -601,29 +603,29 @@ print(df_countries_renew_energy.head())
 
 # extrace data for forest area
 df_countries_forest = df_countries[df_countries["Indicator Name"]
-                                   == "Forest area(km^2)"]
+                                   == "Forest area(%)"]
 
 # explore new dataframe
 print(df_countries_forest.head())
 
 # extrace data for aggricultural land
-df_countries_aggri = df_countries[df_countries["Indicator Name"] ==
-                                  "Agricultural land(km^2)"]
+df_countries_arable = df_countries[df_countries["Indicator Name"] ==
+                                  "Arable land(%)"]
 
 # explore new dataframe
-print(df_countries_aggri)
+print(df_countries_arable)
 
 # call function to create CO2 emission multiple line chart
 plt_co2_emission_line_chart(df_countries_co2)
 
 # call function to create population growth boxplots
-plot_boxplot(df_countries_pop_growth)
+plot_urban_pop_line_chart(df_countries_urb_pop)
 
 # call function to create renew. energy consumption bar charts
-plot_bar_graph(df_countries_renew_energy)
+plot_renew_energy_bar_graph(df_countries_renew_energy)
 
 # call function to create forest area multiple dashed line charts
 plot_forest_area_line_chart(df_countries_forest)
 
 # call function to create forest area multiple dashed line charts
-plot_aggri_land_line_chart(df_countries_aggri)
+plot_arable_land_line_chart(df_countries_arable)
